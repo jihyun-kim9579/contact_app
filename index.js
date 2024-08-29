@@ -3,20 +3,16 @@
 
 //↓ 여기 한줄만 바꿔줘라 ↓
 //const express = require('express')
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
-
 const app = express()
 
-app.get('/', function (req, res) {
-  res.send('GET 요청!')
-});
-app.post('/', function (req, res) {
-    res.send('POST 요청!')
-});
-app.put('/', function (req, res) {
-    res.send('PUT 요청!')
-});
-app.delete('/', function (req, res) {
-    res.send('DELETE 요청!')
-});
+import userRouter from "./routes/userRouter.js";
+
+//console.log(process.env.NODE_ENV); // NODE_ENV 환경변수
+// middleware
+app.use(express.json()); // json 데이터를 express 에서 처리 가능
+app.use("/" , userRouter);
+
 app.listen(3000)
