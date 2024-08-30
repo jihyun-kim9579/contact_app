@@ -9,11 +9,11 @@ import db from "../models/index.js";
 // 작명 : 동사+명사(단수 , 복수)
 // 비동기 통신 callback function --> AJAX -->  Promise --> async / await(현재 최신 문법)
 // localhost:3000/add --> req.body 전달되는 각종 데이터(POST 통신)
-const createUser = async (req,res) => {
-    const {name , phone ,email ,relationship} = req.body; // 요청 바디에서 각 필드값을 추출 (=구조분해할당 문법)
-    try{
+const createUser = async (req, res) => {
+    const { name, phone, email, relationship } = req.body; // 요청 바디에서 각 필드값을 추출 (=구조분해할당 문법)
+    try {
         // 일단
-        console.log(name , phone ,email ,relationship);
+        console.log(name, phone, email, relationship);
         // 이상없으면 ? DB에 데이터를 삽입.create({데이터}) 호출 ==> INSERT
         const result = await db.User.create({
             name,
@@ -21,20 +21,121 @@ const createUser = async (req,res) => {
             email,
             relationship
         })
-        
+
         res.json({
-            status : 201,
+            status: 201,
             result
 
         });
 
-    }catch (error) {
+    } catch (error) {
         console.log('Error' + error);
     }
 };
+const findAllUsers = async (req, res) => {
+    try {
+        const users = await db.User.findAll();
+
+        res.json({
+            status: 200,
+            users: users
+
+        })
+    } catch (error) {
+        console.log("에러메세지: " + error);
+    }
+
+}
+
+const findOneUser = async (req, res) => {
+    console.log("=========== 요청 아이디 :" + req.params.id);
+    try {
+        const foundUser = await db.User.findAll({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!foundUser) {
+            res.json({
+                stauts: 500,
+                message: "사용자 정보를 찾을 수 없습니다."
+
+            });
+        } else {
+            res.json({
+                status: 201,
+                data: foundUser
+            });
+        }
+    } catch (err) {
+        console.log("에러메세지 : " + error);
+    }
+}
+
+const updateUser = async (req, res) => {
+    try {
+        const result = await db.User.update(
+            { email: req.body.eamil }, 
+            {
+            where: {
+                id: req.body.id
+            }
+        });
+        res.json({
+            status : 201,
+            message : "연락처가 업데이트가 되었습니다.",
+            data : result
+        });
+
+    } catch (error) {
+        console.log("에러메세지 :" + error);
+
+    }
+}
+
+const removeUser = async (req, res) => {
+    try {
+        const removeUser = await db.User.destroy({
+            where: {
+                id: req.params.id
+            }
+        })
+        res.json({
+            status: 201,
+            message: "선택하신 연락처 삭제 됨",
+            data: removeUser
+        })
+
+    } catch (error) {
+        console.log("에러메세지 :" + error);
+    }
+};
+
+const removeAllUsers = async (req, res) => {
+    try {
+        const removeAllUsers = await db.User.destroy({
+            truncate: true
+        })
+        res.json({
+            status: 201,
+            message: "연락처가 모두 삭제 되었습니다.",
+            data: removeAllUsers
+        })
+
+    } catch (error) {
+        console.log("에러메세지 :" + error);
+    }
+}
+
 
 const userControl = {
-    createUser
+    createUser,
+    findAllUsers,
+    findOneUser,
+    removeUser,
+    removeAllUsers,
+    updateUser
 }
 
 
